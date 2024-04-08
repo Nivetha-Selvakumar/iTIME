@@ -125,7 +125,6 @@ public class ShiftImpl implements ShiftService {
                 Timestamp startDateTime;
                 Timestamp endDateTime;
 
-                System.out.println(LocalDateTime.of(currentTime.toLocalDate(),startBuffer));
                 if(currentTime.isBefore(shiftEndTime)){
                     currentTime= currentTime.minusDays(1);
                     startDateTime = Timestamp.valueOf(LocalDateTime.of(currentTime.toLocalDate(),startBuffer));
