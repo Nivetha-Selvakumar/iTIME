@@ -6,7 +6,6 @@ import lombok.*;
 import org.springframework.stereotype.Component;
 
 import java.sql.Time;
-import java.sql.Timestamp;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -15,6 +14,7 @@ import java.sql.Timestamp;
 @Data
 @Component
 public class ShiftDTO {
+
     private  Integer id;
 
     @NotBlank(message = "Enter Shift Name")

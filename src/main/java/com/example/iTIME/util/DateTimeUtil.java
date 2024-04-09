@@ -1,6 +1,5 @@
 package com.example.iTIME.util;
 
-import org.apache.logging.log4j.message.StringFormattedMessage;
 import org.springframework.context.annotation.Configuration;
 
 import java.sql.Timestamp;
@@ -11,8 +10,7 @@ import java.time.format.DateTimeFormatter;
 public class DateTimeUtil {
     public LocalDate dateTimeFormatter(String date1) {
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyyMMdd");
-        LocalDate date=LocalDate.parse(date1,dateFormatter);
-        return date;
+        return LocalDate.parse(date1,dateFormatter);
     }
 
     public String convertTimeStampToTime(Timestamp timestamp){
@@ -21,8 +19,7 @@ public class DateTimeUtil {
     }
 
     public String convertHours(Long hours, Long minutes){
-        String format = String.format("%02d:%02d",hours,minutes);
-        return format;
+        return  String.format("%02d:%02d",hours,minutes);
     }
 
 

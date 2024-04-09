@@ -1,19 +1,21 @@
 package com.example.iTIME.util;
 
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor
 public class AppConstant {
 
-    AppConstant() {
-    }
+    public static final String PUNCH_SUCCESSFULLY = "Successfully Punched ";
 
-    public static final String PUNCH_SUCCESSFULLY = "Sucessfully Punch ";
+    public static final String EMPLOYEE_NOT_FOUND = "Employee Not Found";
 
-    public static final String SAME_PUNCH = "Last punch is Same as this punch ";
+    public static final String NO_EMPLOYEE = "Employee ID cannot be null or empty.";
 
-    public static final String EMPLOYEE_NOT_FOUND = "Employee Not found";
+    public static final String NO_DATE = "Date cannot be null or empty";
 
-    public  static final String SHIFT_NOT_FOUND = "Shift not found";
+    public static final String EMPLOYEE_MISMATCH = "Employee Id should contain only numbers";
 
-    public  static final String WORKING_HOURS = "Working Hours is: ";
+    public static final String DATE_MISMATCH = "Date should contain only numbers and is in format YYYYMMDD";
 
-
+    public static final String PUNCHTYPE_MISMATCH = "Punch Type should be IN or OUT";
 }

@@ -20,6 +20,5 @@ public class PunchTypeDTO {
     @NotBlank(message = "Enter Punch Type")
     private PunchType punchType;
 
-
 }
 

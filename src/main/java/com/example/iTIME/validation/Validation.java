@@ -5,22 +5,15 @@ import com.example.iTIME.entity.EmployeeEntity;
 import com.example.iTIME.entity.PunchTypeEntity;
 import com.example.iTIME.repository.EmployeeRepo;
 import com.example.iTIME.repository.PunchTypeRepo;
-import com.example.iTIME.repository.ShiftRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
 @Component
 public class Validation {
     @Autowired
     EmployeeRepo employeeRepo;
-
-    @Autowired
-    ShiftRepo shiftRepo;
-
     @Autowired
     PunchTypeRepo punchTypeRepo;
 
@@ -43,6 +36,4 @@ public class Validation {
         }
         return flag;
     }
-
-
 }

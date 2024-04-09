@@ -18,6 +18,7 @@ import java.sql.Timestamp;
 @Setter
 @Table(name="tbl_punch_type")
 public class PunchTypeEntity {
+
     @Id
     @Column(name = "id", nullable = false)
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -34,6 +35,5 @@ public class PunchTypeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "emp_id", referencedColumnName = "Id", nullable = false)
     private EmployeeEntity empId;
-
 
 }

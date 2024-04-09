@@ -16,6 +16,7 @@ import java.util.List;
 @Setter
 @Table(name="tbl_employee")
 public class EmployeeEntity {
+
     @Id
     @Column(name = "id", nullable = false)
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -33,6 +34,5 @@ public class EmployeeEntity {
 
     @OneToMany(mappedBy = "empId")
     List<PunchTypeEntity> punchTypeEntityList;
-
 
 }

@@ -10,7 +10,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @ComponentScan("com.example.iTIME")
 @EnableScheduling
 public class ItimeApplication {
-
 	public static void main(String[] args) {
 		SpringApplication.run(ItimeApplication.class, args);
 	}
