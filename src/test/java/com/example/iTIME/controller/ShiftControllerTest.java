@@ -1,6 +1,6 @@
 package com.example.iTIME.controller;
 
-import com.example.iTIME.DTO.ResponseWorkHrsDTO;
+import com.example.iTIME.DTO.ResponseWorkingHrsDTO;
 import com.example.iTIME.Exception.CommonException;
 import com.example.iTIME.service.ShiftService;
 import com.example.iTIME.validation.BasicValidation;
@@ -24,14 +24,14 @@ class ShiftControllerTest {
     @Mock
     BasicValidation basicValidation;
 
-    ResponseWorkHrsDTO responseWorkHrsDTO = new ResponseWorkHrsDTO();
+    ResponseWorkingHrsDTO responseWorkingHrsDTO = new ResponseWorkingHrsDTO();
 
     @Test
     void viewShiftWorkingHoursTest() throws CommonException {
         basicValidation.checkEmpIdAndDateBasicValidation("1","20240402");
-        when(shiftService.calculateWorkingHours(Mockito.any(),Mockito.anyString())).thenReturn(responseWorkHrsDTO);
-        ResponseWorkHrsDTO actual = shiftController.viewShiftWorking("1","20240405").getBody();
-        assertEquals(responseWorkHrsDTO,actual);
+        when(shiftService.calculateWorkingHours(Mockito.any(),Mockito.anyString())).thenReturn(responseWorkingHrsDTO);
+        ResponseWorkingHrsDTO actual = shiftController.viewShiftWorking("1","20240405").getBody();
+        assertEquals(responseWorkingHrsDTO,actual);
 
     }
 }

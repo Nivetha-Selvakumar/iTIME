@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 @Setter
 @Data
 @Component
-public class ResponseWorkHrsDTO {
+public class ResponseWorkingHrsDTO {
 
     @NotBlank(message = "First punch time is blank")
     private String punchIn;
@@ -23,5 +23,7 @@ public class ResponseWorkHrsDTO {
 
     @NotBlank(message = "Last punch type is blank")
     private String lastPunchType;
+
+
 
 }

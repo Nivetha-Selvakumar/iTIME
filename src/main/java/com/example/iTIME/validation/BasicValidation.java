@@ -8,7 +8,6 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class BasicValidation {
 
-
     public void checkEmpIdAndDateBasicValidation(String empId, String date) throws CommonException {
         employeeIdBasicValidation(empId);
         dateBasicValidation(date);

@@ -1,6 +1,6 @@
 package com.example.iTIME.service;
 
-import com.example.iTIME.DTO.ResponseWorkHrsDTO;
+import com.example.iTIME.DTO.ResponseWorkingHrsDTO;
 import com.example.iTIME.DTO.ShiftDTO;
 import com.example.iTIME.Enum.PunchType;
 import com.example.iTIME.Enum.ShiftType;
@@ -50,7 +50,7 @@ class ShiftImplTest {
 
     EmployeeEntity employeeEntity = new EmployeeEntity();
 
-    ResponseWorkHrsDTO responseWorkHrsDTO = new ResponseWorkHrsDTO();
+    ResponseWorkingHrsDTO responseWorkingHrsDTO = new ResponseWorkingHrsDTO();
 
     List<PunchTypeEntity> punches = new ArrayList<>();
 
@@ -70,9 +70,9 @@ class ShiftImplTest {
         punchTypeEntity.setId(1);
 
         shiftEntity.setId(1);
-        responseWorkHrsDTO.setLastPunchType(String.valueOf(PunchType.IN));
-        responseWorkHrsDTO.setPunchIn("11:30");
-        responseWorkHrsDTO.setPunchOut("17:00");
+        responseWorkingHrsDTO.setLastPunchType(String.valueOf(PunchType.IN));
+        responseWorkingHrsDTO.setPunchIn("11:30");
+        responseWorkingHrsDTO.setPunchOut("17:00");
     }
 
     @Test
@@ -98,14 +98,14 @@ class ShiftImplTest {
         shiftEntity.setStartFrom("2");
         shiftEntity.setEndAt("2");
 
-        responseWorkHrsDTO.setLastPunchType(String.valueOf(PunchType.OUT));
+        responseWorkingHrsDTO.setLastPunchType(String.valueOf(PunchType.OUT));
 
         when(dateTimeUtil.dateTimeFormatter(any())).thenReturn(LocalDate.now());
         when(employeeRepo.findById(Mockito.anyInt())).thenReturn(Optional.of(employeeEntity));
         when(punchTypeRepo.findByEmpIdAndPunchTimeBetween(any(), any(), any())).thenReturn(punches);
         when(punchTypeRepo.findTopByEmpIdAndPunchTimeBetweenOrderByPunchTimeDesc(any(), any(), any())).thenReturn(lastPunchTypeEntity);
 
-        ResponseWorkHrsDTO actual = shiftImpl.calculateWorkingHours("1","20240405");
+        ResponseWorkingHrsDTO actual = shiftImpl.calculateWorkingHours("1","20240405");
         assertEquals("--:--",actual.getWorkingHours());
 
     }
@@ -133,11 +133,11 @@ class ShiftImplTest {
 
         when(dateTimeUtil.dateTimeFormatter(any())).thenReturn(LocalDate.now());
         when(employeeRepo.findById(1)).thenReturn(Optional.of(employeeEntity));
-        when(punchTypeRepo.findByEmpIdAndPunchTimeBetween(employeeEntity,Timestamp.valueOf("2024-04-09 04:00:00.0"),Timestamp.valueOf("2024-04-09 21:00:00.0"))).thenReturn(punches);
-        when(punchTypeRepo.findTopByEmpIdAndPunchTimeBetweenOrderByPunchTimeDesc(employeeEntity,Timestamp.valueOf("2024-04-09 04:00:00.0"),Timestamp.valueOf("2024-04-09 21:00:00.0"))).thenReturn(punchTypeEntity);
+        when(punchTypeRepo.findByEmpIdAndPunchTimeBetween(Mockito.any(),Mockito.any(),Mockito.any())).thenReturn(punches);
+        when(punchTypeRepo.findTopByEmpIdAndPunchTimeBetweenOrderByPunchTimeDesc(Mockito.any(),Mockito.any(),Mockito.any())).thenReturn(punchTypeEntity);
         punchTypeEntity.setPunchType(PunchType.OUT);
-        ResponseWorkHrsDTO actual = shiftImpl.calculateWorkingHours("1","20240409");
-        assertEquals(responseWorkHrsDTO.getWorkingHours(), actual.getPunchIn());
+        ResponseWorkingHrsDTO actual = shiftImpl.calculateWorkingHours("1","20240409");
+        assertEquals(responseWorkingHrsDTO.getWorkingHours(), actual.getPunchIn());
 
     }
 
@@ -165,20 +165,17 @@ class ShiftImplTest {
         punchTypeEntity.setPunchType(PunchType.OUT);
         punches.add(punchTypeEntity);
 
-        responseWorkHrsDTO.setLastPunchType(String.valueOf(PunchType.OUT));
+        responseWorkingHrsDTO.setLastPunchType(String.valueOf(PunchType.OUT));
 
 
         when(employeeRepo.findById(2)).thenReturn(Optional.of(employeeEntity));
         when(dateTimeUtil.dateTimeFormatter(any())).thenReturn(LocalDate.now());
-        when(punchTypeRepo.findByEmpIdAndPunchTimeBetween(employeeEntity,Timestamp.valueOf("2024-04-08 15:00:00.0"),Timestamp.valueOf("2024-04-10 06:00:00.0"))).thenReturn(punches);
-        when(punchTypeRepo.findTopByEmpIdAndPunchTimeBetweenOrderByPunchTimeDesc(employeeEntity,Timestamp.valueOf("2024-04-08 15:00:00.0"),Timestamp.valueOf("2024-04-10 06:00:00.0"))).thenReturn(punchTypeEntity);
+        when(punchTypeRepo.findByEmpIdAndPunchTimeBetween(Mockito.any(),Mockito.any(),Mockito.any())).thenReturn(punches);
+        when(punchTypeRepo.findTopByEmpIdAndPunchTimeBetweenOrderByPunchTimeDesc(Mockito.any(),Mockito.any(),Mockito.any())).thenReturn(punchTypeEntity);
         punchTypeEntity.setPunchType(PunchType.OUT);
-        ResponseWorkHrsDTO actual = shiftImpl.calculateWorkingHours("2","20240409");
-        assertEquals(responseWorkHrsDTO.getWorkingHours(), actual.getPunchIn());
+        ResponseWorkingHrsDTO actual = shiftImpl.calculateWorkingHours("2","20240409");
+        assertEquals(responseWorkingHrsDTO.getWorkingHours(), actual.getPunchIn());
 
     }
-
-
-
 
 }

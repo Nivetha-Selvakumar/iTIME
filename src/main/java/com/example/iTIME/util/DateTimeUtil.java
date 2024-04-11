@@ -21,6 +21,4 @@ public class DateTimeUtil {
     public String convertHours(Long hours, Long minutes){
         return  String.format("%02d:%02d",hours,minutes);
     }
-
-
 }

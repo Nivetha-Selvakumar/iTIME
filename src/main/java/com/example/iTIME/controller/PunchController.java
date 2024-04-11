@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @CrossOrigin
-@RequestMapping("/webpunch")
+@RequestMapping("/webPunch")
 public class PunchController {
     @Autowired
     PunchService punchService;

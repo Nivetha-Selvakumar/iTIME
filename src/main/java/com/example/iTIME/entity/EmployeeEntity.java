@@ -35,4 +35,7 @@ public class EmployeeEntity {
     @OneToMany(mappedBy = "empId")
     List<PunchTypeEntity> punchTypeEntityList;
 
+    @OneToMany(mappedBy = "empId")
+    List<PermissionTransactionEntity> permissionTransactionEntityList;
+
 }
