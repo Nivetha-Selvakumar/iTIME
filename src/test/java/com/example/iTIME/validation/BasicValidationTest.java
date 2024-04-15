@@ -1,6 +1,7 @@
 package com.example.iTIME.validation;
 
 import com.example.iTIME.Exception.CommonException;
+import com.example.iTIME.Exception.MisMatchException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -46,6 +47,32 @@ class BasicValidationTest {
             basicValidation.checkEmpIdAndDateBasicValidation(empId,date);
         });
     }
+
+    @Test
+    void checkEmpIdAndDateBasicValidationTest5(){
+        String empId = "1";
+        String date = "00000000";
+        assertThrows(MisMatchException.class,()->{
+            basicValidation.checkEmpIdAndDateBasicValidation(empId,date);
+        });
+    }
+
+    @Test
+    void checkEmpIdAndDateBasicValidationTest6(){
+        String empId = "1";
+        String date = "20241512";
+        assertThrows(MisMatchException.class,()->{
+            basicValidation.checkEmpIdAndDateBasicValidation(empId,date);
+        });
+    }
+
+    @Test
+    void checkEmpIdAndDateBasicValidationTest7() throws CommonException {
+        String empId = "1";
+        String date = "20240412";
+        basicValidation.checkEmpIdAndDateBasicValidation(empId,date);
+    }
+
 
     @Test
     void checkEmpIdAndPunchType1(){

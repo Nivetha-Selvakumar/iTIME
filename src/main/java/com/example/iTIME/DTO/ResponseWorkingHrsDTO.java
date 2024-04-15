@@ -24,6 +24,8 @@ public class ResponseWorkingHrsDTO {
     @NotBlank(message = "Last punch type is blank")
     private String lastPunchType;
 
+    private String permissionHours;
 
+    private String actualShiftHours;
 
 }

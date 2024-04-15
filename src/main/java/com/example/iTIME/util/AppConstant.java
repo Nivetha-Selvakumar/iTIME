@@ -18,4 +18,8 @@ public class AppConstant {
     public static final String DATE_MISMATCH = "Date should contain only numbers and is in format YYYYMMDD";
 
     public static final String PUNCHTYPE_MISMATCH = "Punch Type should be IN or OUT";
+
+    public static final String NO_PUNCH = "Punch Type cannot be null or empty";
+    
+    public static final String INVALID_DATE = "Invalid date. Enter correct date";
 }
