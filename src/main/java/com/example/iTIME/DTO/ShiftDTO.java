@@ -15,8 +15,6 @@ import java.sql.Time;
 @Component
 public class ShiftDTO {
 
-    private  Integer id;
-
     @NotBlank(message = "Enter Shift Name")
     private String shiftName;
 

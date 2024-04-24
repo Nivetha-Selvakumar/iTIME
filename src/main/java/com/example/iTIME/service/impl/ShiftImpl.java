@@ -1,33 +1,27 @@
 package com.example.iTIME.service.impl;
 
 import com.example.iTIME.DTO.ResponseWorkingHrsDTO;
+import com.example.iTIME.DTO.ShiftRoasterDTO;
 import com.example.iTIME.DTO.WorkHoursResponseDTO;
-import com.example.iTIME.Enum.PermissionStatus;
-import com.example.iTIME.Enum.PunchType;
-import com.example.iTIME.Enum.ShiftType;
+import com.example.iTIME.Enum.*;
 import com.example.iTIME.Exception.CommonException;
 import com.example.iTIME.Exception.NotFoundException;
-import com.example.iTIME.entity.EmployeeEntity;
-import com.example.iTIME.entity.PermissionTransactionEntity;
-import com.example.iTIME.entity.PunchTypeEntity;
-import com.example.iTIME.repository.EmployeeRepo;
-import com.example.iTIME.repository.PermissionTransactionRepo;
-import com.example.iTIME.repository.PunchTypeRepo;
+import com.example.iTIME.entity.*;
+import com.example.iTIME.repository.*;
 import com.example.iTIME.service.ShiftService;
 import com.example.iTIME.util.AppConstant;
 import com.example.iTIME.util.DateTimeUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.sql.Timestamp;
-import java.time.Duration;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
+import java.time.temporal.WeekFields;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class ShiftImpl implements ShiftService {
@@ -38,6 +32,10 @@ public class ShiftImpl implements ShiftService {
     EmployeeRepo employeeRepo;
     @Autowired
     PermissionTransactionRepo permissionTransactionRepo;
+    @Autowired
+    ShiftRoasterRepo shiftRoasterRepo;
+    @Autowired
+    ShiftRepo shiftRepo;
 
 
     @Override
@@ -105,6 +103,143 @@ public class ShiftImpl implements ShiftService {
         workHoursResponseDTO.setPermissionHours(responseWorkingHrsDTO.getPermissionHours());
         return workHoursResponseDTO;
     }
+
+    @Override
+    public void shiftAssign(String empId1, ShiftRoasterDTO shiftRoasterDTO) throws CommonException {
+        Integer empId = Integer.valueOf(empId1);
+        Integer year = Integer .valueOf(shiftRoasterDTO.getYear());
+
+        EmployeeEntity employeeEntity = employeeRepo.findById(empId).orElseThrow(
+                ()->new NotFoundException(AppConstant.EMPLOYEE_NOT_FOUND));
+        ShiftEntity shiftEntity = shiftRepo.findById(Integer.valueOf(shiftRoasterDTO.getShiftType()))
+                .orElseThrow(()-> new NotFoundException(AppConstant.SHIFT_NOT_FOUND));
+
+        ShiftRoasterEntity shiftRoasterEntity = new ShiftRoasterEntity();
+        EmployeeEntity employeeEntity1 = new EmployeeEntity();
+
+        if(shiftRoasterDTO.getAssignShiftType().equals(ShiftRoasterType.MONTHLY)){
+            Integer month = Integer.valueOf(shiftRoasterDTO.getMonth());
+//            LocalDate startDate = LocalDate.of(year,month,1);
+//            LocalDate endDate = LocalDate.of(year,month+1,1).minusDays(1);
+            LocalDate startDate= LocalDate.parse(shiftRoasterDTO.getStartDate());
+            LocalDate endDate = LocalDate.parse(shiftRoasterDTO.getEndDate());
+            for (Integer employeeId : shiftRoasterDTO.getEmployeeList()){
+                for (LocalDate date = startDate; !date.isAfter(endDate); date=date.plusDays(1)) {
+                    int dayOfMonth = date.getDayOfMonth();
+                    boolean isWeekOff= isWeekOff(date,shiftRoasterDTO);
+
+                    Integer shiftValue = isWeekOff ? 0 : shiftEntity.getId();
+                    setShiftValue(shiftValue, dayOfMonth,shiftRoasterEntity);
+                }
+                employeeEntity1.setId(employeeId);
+                shiftRoasterEntity.setEmpId(employeeEntity1);
+                shiftRoasterEntity.setMonth(month);
+                shiftRoasterEntity.setYear(year);
+                shiftRoasterEntity.setCreatedBy(employeeEntity.getEmpName()); // Set created by user
+                shiftRoasterEntity.setUpdatedBy(employeeEntity.getEmpName());
+                shiftRoasterRepo.save(shiftRoasterEntity);
+            }
+        } else if (shiftRoasterDTO.getAssignShiftType().equals(ShiftRoasterType.ANNUAL)) {
+            LocalDate startDate = LocalDate.of(year, 1, 1);
+            LocalDate endDate = LocalDate.of(year, 12, 31);
+            for (Integer employeeId : shiftRoasterDTO.getEmployeeList()) {
+                for (int setMonth = 1; setMonth <= 12; setMonth++) {
+                    ShiftRoasterEntity shiftRoasterEntityForMonth = new ShiftRoasterEntity();
+                    for (LocalDate date = startDate; !date.isAfter(endDate) && date.getMonth().getValue() <= endDate.getMonth().getValue(); date = date.plusDays(1)){
+
+                        int dayOfMonth = date.getDayOfMonth();
+                        boolean isWeekOffAnnual = isWeekOffAnnual(date, shiftRoasterDTO);
+                        Integer shiftValue = isWeekOffAnnual ? 0 : shiftEntity.getId();
+                        setShiftValue(shiftValue, dayOfMonth, shiftRoasterEntityForMonth); // Set shift value for each day
+                    }
+                    shiftRoasterEntityForMonth.setMonth(setMonth);
+                    employeeEntity1.setId(employeeId);
+                    shiftRoasterEntityForMonth.setEmpId(employeeEntity1);
+                    shiftRoasterEntityForMonth.setYear(year);
+                    shiftRoasterEntityForMonth.setCreatedBy(employeeEntity.getEmpName()); // Set created by user
+                    shiftRoasterEntityForMonth.setUpdatedBy(employeeEntity.getEmpName());
+                    shiftRoasterRepo.save(shiftRoasterEntityForMonth); // Save entity for the month
+                }
+            }
+        }else{
+            throw new NotFoundException(AppConstant.ILLEGAL_ASSIGNING_SHIFT);
+        }
+
+    }
+
+    private boolean isWeekOffAnnual(LocalDate date, ShiftRoasterDTO shiftRoasterDTO) {
+        Date date1 = Date.from(date.atStartOfDay(ZoneId.systemDefault()).toInstant());
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date1);
+        List<String> weekOffList = shiftRoasterDTO.getWeekOff1();
+        DayOfWeek dayOfWeek = date.getDayOfWeek();
+        String dayName = dayOfWeek.toString().substring(0,3).toUpperCase();
+        for (String day : weekOffList) {
+            if (day != null && EnumDayOfWeek.valueOf(day.trim()).getDay().equals(dayName)){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean isWeekOff(LocalDate date, ShiftRoasterDTO shiftRoasterDTO) {
+        Date date1 = Date.from(date.atStartOfDay(ZoneId.systemDefault()).toInstant());
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date1);
+        int weekOfMonth = calendar.get(Calendar.WEEK_OF_MONTH);
+        List<String> weekOffList = findWeekOffList(weekOfMonth,shiftRoasterDTO);
+        if (weekOffList != null) {
+            DayOfWeek dayOfWeek = date.getDayOfWeek();
+            String dayName = dayOfWeek.toString().substring(0,3).toUpperCase();
+            for (String day : weekOffList) {
+                if (day != null && EnumDayOfWeek.valueOf(day.trim()).getDay().equals(dayName)){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private void setShiftValue(Integer value, int dayOfMonth, ShiftRoasterEntity shiftRoasterEntity) {
+        Map<Integer, String> daySetterMap = createDaySetterMap();
+        String setterMethodName = daySetterMap.get(dayOfMonth);
+        if (setterMethodName != null) {
+            try {
+                shiftRoasterEntity.getClass()
+                        .getMethod(setterMethodName, Integer.class)
+                        .invoke(shiftRoasterEntity, value);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private Map<Integer, String> createDaySetterMap() {
+        Map<Integer, String> daySetterMap = new HashMap<>();
+        for (int i = 1; i <= 31; i++) {
+            daySetterMap.put(i, "setDay" + String.format("%02d", i));
+        }
+        return daySetterMap;
+    }
+
+
+    private List<String> findWeekOffList(int weekOfMonth, ShiftRoasterDTO shiftRoasterDTO) {
+        if(AppConstant.FIRST_WEEK == weekOfMonth){
+            return shiftRoasterDTO.getWeekOff1();
+        }else if (AppConstant.SECOND_WEEK == weekOfMonth) {
+            return shiftRoasterDTO.getWeekOff2();
+        }else if (AppConstant.THIRD_WEEK == weekOfMonth) {
+            return shiftRoasterDTO.getWeekOff3();
+        }else if (AppConstant.FOURTH_WEEK == weekOfMonth) {
+            return shiftRoasterDTO.getWeekOff4();
+        }else if (AppConstant.FIFTH_WEEK == weekOfMonth) {
+            return shiftRoasterDTO.getWeekOff5();
+        }else if (AppConstant.SIXTH_WEEK == weekOfMonth) {
+            return shiftRoasterDTO.getWeekOff6();
+        }
+        return new ArrayList<>();
+    }
+
 
     private ResponseWorkingHrsDTO calculateShiftWorkingHoursDifference(LocalTime workingTime, LocalTime shiftTime, LocalDate date, ResponseWorkingHrsDTO responseWorkingHrsDTO, EmployeeEntity employeeEntity) {
         Timestamp startOfDay = Timestamp.valueOf(date.atStartOfDay());

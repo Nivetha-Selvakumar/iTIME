@@ -1,8 +1,12 @@
 package com.example.iTIME.util;
 
+import com.example.iTIME.Exception.CommonException;
+import org.springdoc.api.ErrorMessage;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
 
 import java.sql.Timestamp;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.LocalDate;
@@ -31,5 +35,14 @@ public class DateTimeUtil {
         long hours = duration.toHours();
         long minutes = duration.minusHours(hours).toMinutes();
         return  String.format("%02d:%02d",hours,minutes);
+    }
+
+    public static Timestamp convertToTimeStamp(String date) throws CommonException {
+        try{
+            return new Timestamp(new SimpleDateFormat(AppConstant.DATEONLY_FORMAT).parse(date).getTime());
+        }catch (final ParseException e){
+            throw new CommonException(String.format(AppConstant.INVALID_DATE,date));
+
+        }
     }
 }

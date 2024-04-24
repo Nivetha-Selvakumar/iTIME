@@ -22,6 +22,11 @@ public class BasicValidation {
 
     }
 
+
+    public void checkEmpId(String empId) throws CommonException {
+        employeeIdBasicValidation(empId);
+    }
+
     private void punchTypeBasicValidation(String punchType) throws CommonException {
         if (punchType == null || punchType.isEmpty()){
             throw new NullPointerException(AppConstant.NO_PUNCH);

@@ -1,5 +1,6 @@
 package com.example.iTIME.util;
 
+import com.example.iTIME.Enum.ShiftRoasterType;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
@@ -22,4 +23,22 @@ public class AppConstant {
     public static final String NO_PUNCH = "Punch Type cannot be null or empty";
     
     public static final String INVALID_DATE = "Invalid date. Enter correct date";
+
+    public static final String SUCCESSFULLY_REGISTERED = "Successfully Registered";
+
+    public static final String DATEONLY_FORMAT = "yyyyMMdd";
+
+    public static final int FIRST_WEEK = 1;
+
+    public static final int SECOND_WEEK = 2;
+
+    public static final int THIRD_WEEK = 3;
+
+    public static final int FOURTH_WEEK = 4;
+
+    public static final int FIFTH_WEEK = 5;
+
+    public static final int SIXTH_WEEK = 6;
+    public static final String SHIFT_NOT_FOUND = "Shift Not Found";
+    public static final String ILLEGAL_ASSIGNING_SHIFT = "Assigning Shift Type should only be MONTHLY or ANNUAL.  ";
 }

@@ -14,7 +14,6 @@ public class PunchTypeMapper {
     public PunchTypeEntity punchModelToEntity(PunchType punchType, EmployeeEntity employeeEntity) {
 
         PunchTypeEntity punchTypeEntity = new PunchTypeEntity();
-        punchTypeEntity.setPunchTime(Timestamp.from(Instant.now()));
         punchTypeEntity.setPunchType(punchType);
         punchTypeEntity.setEmpId(employeeEntity);
 
