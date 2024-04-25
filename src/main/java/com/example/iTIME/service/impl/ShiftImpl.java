@@ -119,8 +119,6 @@ public class ShiftImpl implements ShiftService {
 
         if(shiftRoasterDTO.getAssignShiftType().equals(ShiftRoasterType.MONTHLY)){
             Integer month = Integer.valueOf(shiftRoasterDTO.getMonth());
-//            LocalDate startDate = LocalDate.of(year,month,1);
-//            LocalDate endDate = LocalDate.of(year,month+1,1).minusDays(1);
             LocalDate startDate= LocalDate.parse(shiftRoasterDTO.getStartDate());
             LocalDate endDate = LocalDate.parse(shiftRoasterDTO.getEndDate());
             for (Integer employeeId : shiftRoasterDTO.getEmployeeList()){
@@ -145,20 +143,21 @@ public class ShiftImpl implements ShiftService {
             for (Integer employeeId : shiftRoasterDTO.getEmployeeList()) {
                 for (int setMonth = 1; setMonth <= 12; setMonth++) {
                     ShiftRoasterEntity shiftRoasterEntityForMonth = new ShiftRoasterEntity();
-                    for (LocalDate date = startDate; !date.isAfter(endDate) && date.getMonth().getValue() <= endDate.getMonth().getValue(); date = date.plusDays(1)){
+                    for (LocalDate date = startDate; !date.isAfter(endDate) && date.getMonth().getValue() <=
+                            endDate.getMonth().getValue(); date = date.plusDays(1)){
 
                         int dayOfMonth = date.getDayOfMonth();
                         boolean isWeekOffAnnual = isWeekOffAnnual(date, shiftRoasterDTO);
                         Integer shiftValue = isWeekOffAnnual ? 0 : shiftEntity.getId();
-                        setShiftValue(shiftValue, dayOfMonth, shiftRoasterEntityForMonth); // Set shift value for each day
+                        setShiftValue(shiftValue, dayOfMonth, shiftRoasterEntityForMonth);
                     }
                     shiftRoasterEntityForMonth.setMonth(setMonth);
                     employeeEntity1.setId(employeeId);
                     shiftRoasterEntityForMonth.setEmpId(employeeEntity1);
                     shiftRoasterEntityForMonth.setYear(year);
-                    shiftRoasterEntityForMonth.setCreatedBy(employeeEntity.getEmpName()); // Set created by user
+                    shiftRoasterEntityForMonth.setCreatedBy(employeeEntity.getEmpName());
                     shiftRoasterEntityForMonth.setUpdatedBy(employeeEntity.getEmpName());
-                    shiftRoasterRepo.save(shiftRoasterEntityForMonth); // Save entity for the month
+                    shiftRoasterRepo.save(shiftRoasterEntityForMonth);
                 }
             }
         }else{
