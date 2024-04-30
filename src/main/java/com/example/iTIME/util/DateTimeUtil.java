@@ -1,9 +1,8 @@
 package com.example.iTIME.util;
 
+import com.example.iTIME.DTO.ShiftRoasterDTO;
 import com.example.iTIME.Exception.CommonException;
-import org.springdoc.api.ErrorMessage;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpStatus;
 
 import java.sql.Timestamp;
 import java.text.ParseException;
@@ -11,6 +10,11 @@ import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 @Configuration
 public class DateTimeUtil {
 
@@ -45,4 +49,17 @@ public class DateTimeUtil {
 
         }
     }
+
+    public static List<LocalDate> calculateWeekOffs(LocalDate startDate, LocalDate endDate, ShiftRoasterDTO shiftRoasterDTO) {
+        long numOfDays = ChronoUnit.DAYS.between(startDate, endDate);
+        return Stream.iterate(startDate, date -> date.plusDays(1))
+                .limit(numOfDays)
+                .filter(date -> getIsWeekOff(date, shiftRoasterDTO.getWeekOff1()))
+                .collect(Collectors.toList());
+    }
+
+    private static boolean getIsWeekOff(LocalDate date, List<String> weekOff1) {
+        return weekOff1.contains(date.getDayOfWeek().toString().substring(0, 3));
+    }
+
 }

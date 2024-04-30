@@ -1,6 +1,5 @@
 package com.example.iTIME.util;
 
-import com.example.iTIME.Enum.ShiftRoasterType;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor

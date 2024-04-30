@@ -5,6 +5,7 @@ import com.example.iTIME.entity.EmployeeEntity;
 import com.example.iTIME.entity.PunchTypeEntity;
 import com.example.iTIME.repository.EmployeeRepo;
 import com.example.iTIME.repository.PunchTypeRepo;
+import com.example.iTIME.repository.ShiftRoasterRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -17,6 +18,8 @@ public class Validation {
     EmployeeRepo employeeRepo;
     @Autowired
     PunchTypeRepo punchTypeRepo;
+    @Autowired
+    ShiftRoasterRepo shiftRoasterRepo;
 
     public boolean checkEmployeeId(Integer empId){
         boolean flag = false;
@@ -37,4 +40,5 @@ public class Validation {
         }
         return flag;
     }
+
 }

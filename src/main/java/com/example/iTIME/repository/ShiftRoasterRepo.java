@@ -6,11 +6,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @EnableJpaRepositories
 @Repository
 public interface ShiftRoasterRepo extends JpaRepository<ShiftRoasterEntity, Integer> {
 
-//    ShiftRoasterEntity findByEmpIdAndOrderByDesc(EmployeeEntity employeeEntity);
-
-    ShiftRoasterEntity findByEmpId(EmployeeEntity employeeEntity);
+        Optional<ShiftRoasterEntity> findByEmpIdAndMonthAndYear(EmployeeEntity employeeEntity1, Integer month, Integer year);
 }
