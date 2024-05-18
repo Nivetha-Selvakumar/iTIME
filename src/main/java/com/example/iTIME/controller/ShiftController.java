@@ -1,7 +1,7 @@
 package com.example.iTIME.controller;
 
 import com.example.iTIME.DTO.ResponseWorkingHrsDTO;
-import com.example.iTIME.DTO.ShiftRoasterDTO;
+import com.example.iTIME.DTO.ShiftRosterDTO;
 import com.example.iTIME.DTO.WorkHoursResponseDTO;
 import com.example.iTIME.Exception.CommonException;
 import com.example.iTIME.service.ShiftService;
@@ -38,9 +38,9 @@ public class ShiftController {
     }
 
     @PostMapping(path = "/shiftRoaster/create")
-    public String createShiftRoaster(@RequestHeader String empId, @RequestBody ShiftRoasterDTO shiftRoasterDTO) throws CommonException {
+    public String createShiftRoaster(@RequestHeader String empId, @RequestBody ShiftRosterDTO shiftRosterDTO) throws CommonException {
         basicValidation.checkEmpId(empId);
-        shiftService.shiftAssign(empId,shiftRoasterDTO);
+        shiftService.shiftAssign(empId,shiftRosterDTO);
         return AppConstant.SUCCESSFULLY_REGISTERED;
     }
 

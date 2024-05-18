@@ -1,7 +1,7 @@
 package com.example.iTIME.service.impl;
 
 import com.example.iTIME.DTO.ResponseWorkingHrsDTO;
-import com.example.iTIME.DTO.ShiftRoasterDTO;
+import com.example.iTIME.DTO.ShiftRosterDTO;
 import com.example.iTIME.DTO.WorkHoursResponseDTO;
 import com.example.iTIME.Enum.*;
 import com.example.iTIME.Exception.CommonException;
@@ -87,7 +87,6 @@ public class ShiftImpl implements ShiftService {
             if(workingTime.isAfter(shiftTime)){
                 ResponseWorkingHrsDTO extraHoursTime = calculateShiftWorkingHoursDifference(workingTime,shiftTime,date,responseWorkingHrsDTO,employeeEntity);
                 workHoursResponseDTO.setExtraHours(extraHoursTime.getActualShiftHours());
-
             } else if (workingTime.isBefore(shiftTime)) {
                 ResponseWorkingHrsDTO shortFallTime = calculateShiftWorkingHoursDifference(workingTime,shiftTime,date,responseWorkingHrsDTO,employeeEntity);
                 workHoursResponseDTO.setShortFall(shortFallTime.getActualShiftHours());
@@ -104,86 +103,89 @@ public class ShiftImpl implements ShiftService {
     }
 
     @Override
-    public void shiftAssign(String empId1, ShiftRoasterDTO shiftRoasterDTO) throws CommonException {
+    public void shiftAssign(String empId1, ShiftRosterDTO shiftRosterDTO) throws CommonException {
 
         Integer empId = Integer.valueOf(empId1);
-        int year = Integer.parseInt(shiftRoasterDTO.getYear());
+        int year = Integer.parseInt(shiftRosterDTO.getYear());
 
         EmployeeEntity employeeEntity = employeeRepo.findById(empId).orElseThrow(
                 ()->new NotFoundException(AppConstant.EMPLOYEE_NOT_FOUND));
-        ShiftEntity shiftEntity = shiftRepo.findById(Integer.valueOf(shiftRoasterDTO.getShiftType()))
+        ShiftEntity shiftEntity = shiftRepo.findById(Integer.valueOf(shiftRosterDTO.getShiftType()))
                 .orElseThrow(()-> new NotFoundException(AppConstant.SHIFT_NOT_FOUND));
+        validation.checkEmployeeList(shiftRosterDTO.getEmployeeList());
+        if(shiftRosterDTO.getAssignShiftType().equals(String.valueOf(ShiftRoasterType.MONTHLY))){
 
-        if(shiftRoasterDTO.getAssignShiftType().equals(ShiftRoasterType.MONTHLY)){
+            LocalDate startDate= LocalDate.parse(shiftRosterDTO.getStartDate());
+            LocalDate endDate = LocalDate.parse(shiftRosterDTO.getEndDate());
 
-            LocalDate startDate= LocalDate.parse(shiftRoasterDTO.getStartDate());
-            LocalDate endDate = LocalDate.parse(shiftRoasterDTO.getEndDate());
+            assignMonth(startDate,endDate,shiftRosterDTO,shiftEntity,employeeEntity,year);
 
-            assignMonth(startDate,endDate,shiftRoasterDTO,shiftEntity,employeeEntity,year);
-
-        } else if (shiftRoasterDTO.getAssignShiftType().equals(ShiftRoasterType.ANNUAL)) {
+        } else if (shiftRosterDTO.getAssignShiftType().equals(String.valueOf(ShiftRoasterType.ANNUAL))) {
 
             LocalDate startDate = LocalDate.of(year, 1, 1);
             LocalDate endDate = LocalDate.of(year, 12, 31);
 
-            assignMonth(startDate,endDate,shiftRoasterDTO,shiftEntity,employeeEntity,year);
+            assignMonth(startDate,endDate,shiftRosterDTO,shiftEntity,employeeEntity,year);
             for (int setMonth = 1; setMonth <= 12; setMonth++) {
-                assignMonth(startDate,endDate,shiftRoasterDTO,shiftEntity,employeeEntity,year);
+                assignMonth(startDate,endDate,shiftRosterDTO,shiftEntity,employeeEntity,year);
             }
         }else{
             throw new NotFoundException(AppConstant.ILLEGAL_ASSIGNING_SHIFT);
         }
     }
 
-    private void assignMonth(LocalDate startDate, LocalDate endDate, ShiftRoasterDTO shiftRoasterDTO,
+    private void assignMonth(LocalDate startDate, LocalDate endDate, ShiftRosterDTO shiftRosterDTO,
                                            ShiftEntity shiftEntity,
                                            EmployeeEntity employeeEntity, Integer year) {
         int month=0;
-        if(shiftRoasterDTO.getAssignShiftType().equals(ShiftRoasterType.MONTHLY)){
-           month = Integer.parseInt(shiftRoasterDTO.getMonth());
-           assignShiftForEachEmployee(startDate,endDate,shiftRoasterDTO,shiftEntity,employeeEntity,year,month);
-        }else if(shiftRoasterDTO.getAssignShiftType().equals(ShiftRoasterType.ANNUAL)){
+        if(shiftRosterDTO.getAssignShiftType().equals(String.valueOf(ShiftRoasterType.MONTHLY))){
+           month = Integer.parseInt(shiftRosterDTO.getMonth());
+           assignShiftForEachEmployee(startDate,endDate,shiftRosterDTO,shiftEntity,employeeEntity,year,month);
+        }else if(shiftRosterDTO.getAssignShiftType().equals(String.valueOf(ShiftRoasterType.ANNUAL))){
             for (int setmonth = 1; setmonth<=12;setmonth++){
                 month=setmonth;
-                assignShiftForEachEmployee(startDate,endDate,shiftRoasterDTO,shiftEntity,employeeEntity,year,month);
+                assignShiftForEachEmployee(startDate,endDate,shiftRosterDTO,shiftEntity,employeeEntity,year,month);
             }
         }
     }
 
     private void assignShiftForEachEmployee(LocalDate startDate, LocalDate endDate,
-                                            ShiftRoasterDTO shiftRoasterDTO, ShiftEntity shiftEntity,
+                                            ShiftRosterDTO shiftRoasterDTO, ShiftEntity shiftEntity,
                                             EmployeeEntity employeeEntity, Integer year, Integer month) {
-        ShiftRoasterEntity shiftRoasterEntity = new ShiftRoasterEntity();
+        ShiftRosterEntity shiftRosterEntity = new ShiftRosterEntity();
         EmployeeEntity employeeEntity1 = new EmployeeEntity();
         for (Integer employeeId : shiftRoasterDTO.getEmployeeList()) {
             employeeEntity1.setId(employeeId);
-            shiftRoasterEntity = createShiftRoasterEntity(employeeEntity1,startDate,endDate,shiftEntity,
-                    employeeEntity,month,year,shiftRoasterDTO,shiftRoasterEntity);
-            shiftRoasterRepo.save(shiftRoasterEntity);
+            shiftRosterEntity = createShiftRoasterEntity(employeeEntity1,startDate,endDate,shiftEntity,
+                    employeeEntity,month,year,shiftRoasterDTO, shiftRosterEntity);
+            shiftRoasterRepo.save(shiftRosterEntity);
         }
 
     }
 
-    private ShiftRoasterEntity createShiftRoasterEntity(EmployeeEntity employeeEntity1, LocalDate startDate,
-                                                        LocalDate endDate, ShiftEntity shiftEntity,
-                                                        EmployeeEntity employeeEntity, Integer month, Integer year,
-                                                        ShiftRoasterDTO shiftRoasterDTO, ShiftRoasterEntity shiftRoasterEntity) {
-        Optional<ShiftRoasterEntity> shiftRoasterEntity1 = shiftRoasterRepo.findByEmpIdAndMonthAndYear(employeeEntity1,month,year);
+    private ShiftRosterEntity createShiftRoasterEntity(EmployeeEntity employeeEntity1, LocalDate startDate,
+                                                       LocalDate endDate, ShiftEntity shiftEntity,
+                                                       EmployeeEntity employeeEntity, Integer month, Integer year,
+                                                       ShiftRosterDTO shiftRosterDTO, ShiftRosterEntity shiftRosterEntity) {
+        Optional<ShiftRosterEntity> shiftRoasterEntity1 = shiftRoasterRepo.findByEmpIdAndMonthAndYear(employeeEntity1,month,year);
 
-        if(shiftRoasterDTO.getAssignShiftType().equals(ShiftRoasterType.MONTHLY)){
+
+
+
+        if(shiftRosterDTO.getAssignShiftType().equals(String.valueOf(ShiftRoasterType.MONTHLY))){
             for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
                 int dayOfMonth = date.getDayOfMonth();
-                boolean isWeekOff = isWeekOff(date, shiftRoasterDTO);
-
+                boolean isWeekOff = isWeekOff(date, shiftRosterDTO);
+//                validation.checkShiftWeekOffValidation(date,lastWeekOfMonth,isWeekOff);
                 Integer shiftValue = isWeekOff ? 0 : shiftEntity.getId();
                 if (shiftRoasterEntity1.isEmpty()) {
-                    setShiftValue(shiftValue, dayOfMonth, shiftRoasterEntity);
+                    setShiftValue(shiftValue, dayOfMonth, shiftRosterEntity);
                 } else {
                     setShiftValue(shiftValue, dayOfMonth, shiftRoasterEntity1.get());
-                    shiftRoasterEntity = shiftRoasterEntity1.get();
+                    shiftRosterEntity = shiftRoasterEntity1.get();
                 }
             }
-        }else if(shiftRoasterDTO.getAssignShiftType().equals(ShiftRoasterType.ANNUAL)){
+        }else if(shiftRosterDTO.getAssignShiftType().equals(String.valueOf(ShiftRoasterType.ANNUAL))){
             LocalDate setStartDateMonth = LocalDate.of(year, month, 1);
             LocalDate setEndDateMonth = LocalDate.of(year, month, 1).plusMonths(1).minusDays(1);
 
@@ -191,32 +193,33 @@ public class ShiftImpl implements ShiftService {
                     !date.isAfter(setEndDateMonth); date = date.plusDays(1)) {
 
                 int dayOfMonth = date.getDayOfMonth();
-                boolean isWeekOffAnnual = isWeekOff(date, shiftRoasterDTO);
+                boolean isWeekOffAnnual = isWeekOff(date, shiftRosterDTO);
                 Integer shiftValue = isWeekOffAnnual ? 0 : shiftEntity.getId();
                 if (shiftRoasterEntity1.isEmpty()) {
-                    setShiftValue(shiftValue, dayOfMonth, shiftRoasterEntity);
+                    setShiftValue(shiftValue, dayOfMonth, shiftRosterEntity);
                 } else {
                     setShiftValue(shiftValue, dayOfMonth, shiftRoasterEntity1.get());
-                    shiftRoasterEntity = shiftRoasterEntity1.get();
+                    shiftRosterEntity = shiftRoasterEntity1.get();
                 }
             }
         }
-        shiftRoasterEntity.setEmpId(employeeEntity1);
-        shiftRoasterEntity.setMonth(month);
-        shiftRoasterEntity.setYear(year);
-        shiftRoasterEntity.setCreatedBy(employeeEntity.getEmpName());
-        shiftRoasterEntity.setUpdatedBy(employeeEntity.getEmpName());
-        return shiftRoasterEntity;
+
+        shiftRosterEntity.setEmpId(employeeEntity1);
+        shiftRosterEntity.setMonth(month);
+        shiftRosterEntity.setYear(year);
+        shiftRosterEntity.setCreatedBy(employeeEntity.getEmpName());
+        shiftRosterEntity.setUpdatedBy(employeeEntity.getEmpName());
+        return shiftRosterEntity;
     }
 
 
-    private boolean isWeekOff(LocalDate date, ShiftRoasterDTO shiftRoasterDTO) {
+    private boolean isWeekOff(LocalDate date, ShiftRosterDTO shiftRosterDTO) {
         Date date1 = Date.from(date.atStartOfDay(ZoneId.systemDefault()).toInstant());
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(date1);
-        if(shiftRoasterDTO.getAssignShiftType().equals(ShiftRoasterType.MONTHLY)){
+        if(shiftRosterDTO.getAssignShiftType().equals(String.valueOf(ShiftRoasterType.MONTHLY))){
             int weekOfMonth = calendar.get(Calendar.WEEK_OF_MONTH);
-            List<String> weekOffList = findWeekOffList(weekOfMonth,shiftRoasterDTO);
+            List<String> weekOffList = findWeekOffList(weekOfMonth,shiftRosterDTO);
             if (weekOffList != null) {
                 DayOfWeek dayOfWeek = date.getDayOfWeek();
                 String dayName = dayOfWeek.toString().substring(0,3).toUpperCase();
@@ -226,8 +229,8 @@ public class ShiftImpl implements ShiftService {
                     }
                 }
             }
-        } else if (shiftRoasterDTO.getAssignShiftType().equals(ShiftRoasterType.ANNUAL)) {
-            List<String> weekOffList = shiftRoasterDTO.getWeekOff1();
+        } else if (shiftRosterDTO.getAssignShiftType().equals(String.valueOf(ShiftRoasterType.ANNUAL))){
+            List<String> weekOffList = shiftRosterDTO.getWeekOff1();
             DayOfWeek dayOfWeek = date.getDayOfWeek();
             String dayName = dayOfWeek.toString().substring(0,3).toUpperCase();
             for (String day : weekOffList) {
@@ -239,14 +242,14 @@ public class ShiftImpl implements ShiftService {
         return false;
     }
 
-    private void setShiftValue(Integer value, int dayOfMonth, ShiftRoasterEntity shiftRoasterEntity) {
+    private void setShiftValue(Integer value, int dayOfMonth, ShiftRosterEntity shiftRosterEntity) {
         Map<Integer, String> daySetterMap = createDaySetterMap();
         String setterMethodName = daySetterMap.get(dayOfMonth);
         if (setterMethodName != null) {
             try {
-                shiftRoasterEntity.getClass()
+                shiftRosterEntity.getClass()
                         .getMethod(setterMethodName, Integer.class)
-                        .invoke(shiftRoasterEntity, value);
+                        .invoke(shiftRosterEntity, value);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -261,20 +264,19 @@ public class ShiftImpl implements ShiftService {
         return daySetterMap;
     }
 
-
-    private List<String> findWeekOffList(int weekOfMonth, ShiftRoasterDTO shiftRoasterDTO) {
+    private List<String> findWeekOffList(int weekOfMonth, ShiftRosterDTO shiftRosterDTO) {
         if(AppConstant.FIRST_WEEK == weekOfMonth){
-            return shiftRoasterDTO.getWeekOff1();
+            return shiftRosterDTO.getWeekOff1();
         }else if (AppConstant.SECOND_WEEK == weekOfMonth) {
-            return shiftRoasterDTO.getWeekOff2();
+            return shiftRosterDTO.getWeekOff2();
         }else if (AppConstant.THIRD_WEEK == weekOfMonth) {
-            return shiftRoasterDTO.getWeekOff3();
+            return shiftRosterDTO.getWeekOff3();
         }else if (AppConstant.FOURTH_WEEK == weekOfMonth) {
-            return shiftRoasterDTO.getWeekOff4();
+            return shiftRosterDTO.getWeekOff4();
         }else if (AppConstant.FIFTH_WEEK == weekOfMonth) {
-            return shiftRoasterDTO.getWeekOff5();
+            return shiftRosterDTO.getWeekOff5();
         }else if (AppConstant.SIXTH_WEEK == weekOfMonth) {
-            return shiftRoasterDTO.getWeekOff6();
+            return shiftRosterDTO.getWeekOff6();
         }
         return new ArrayList<>();
     }

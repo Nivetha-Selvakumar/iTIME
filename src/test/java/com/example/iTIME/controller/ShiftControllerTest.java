@@ -1,9 +1,11 @@
 package com.example.iTIME.controller;
 
 import com.example.iTIME.DTO.ResponseWorkingHrsDTO;
+import com.example.iTIME.DTO.ShiftRosterDTO;
 import com.example.iTIME.DTO.WorkHoursResponseDTO;
 import com.example.iTIME.Exception.CommonException;
 import com.example.iTIME.service.ShiftService;
+import com.example.iTIME.util.AppConstant;
 import com.example.iTIME.validation.BasicValidation;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -44,5 +46,13 @@ class ShiftControllerTest {
         WorkHoursResponseDTO actual = shiftController.viewWorkHours("1","20240405").getBody();
         assertEquals(workHoursResponseDTO,actual);
 
+    }
+
+    @Test
+    void createShiftRoasterTest() throws CommonException {
+        basicValidation.checkEmpId("1");
+        shiftService.shiftAssign(Mockito.any(),Mockito.any());
+        String actual= shiftController.createShiftRoaster("1",new ShiftRosterDTO());
+        assertEquals(AppConstant.SUCCESSFULLY_REGISTERED,actual);
     }
 }

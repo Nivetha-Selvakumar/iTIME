@@ -16,8 +16,8 @@
     @AllArgsConstructor
     @Getter
     @Setter
-    @Table(name="tbl_shift_roaster")
-    public class ShiftRoasterEntity {
+    @Table(name="tbl_shift_roster")
+    public class ShiftRosterEntity {
     
         @Id
         @Column(name = "id", nullable = false)

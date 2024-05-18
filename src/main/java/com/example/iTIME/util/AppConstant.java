@@ -25,7 +25,7 @@ public class AppConstant {
 
     public static final String SUCCESSFULLY_REGISTERED = "Successfully Registered";
 
-    public static final String DATEONLY_FORMAT = "yyyyMMdd";
+    public static final String DATE_ONLY_FORMAT = "yyyyMMdd";
 
     public static final int FIRST_WEEK = 1;
 
@@ -40,4 +40,5 @@ public class AppConstant {
     public static final int SIXTH_WEEK = 6;
     public static final String SHIFT_NOT_FOUND = "Shift Not Found";
     public static final String ILLEGAL_ASSIGNING_SHIFT = "Assigning Shift Type should only be MONTHLY or ANNUAL.  ";
+    public static final String INVALID_EMPLOYEE_IN_LIST = "One of the Employee is Not Found";
 }

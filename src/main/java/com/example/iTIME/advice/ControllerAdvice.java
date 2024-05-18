@@ -2,6 +2,7 @@ package com.example.iTIME.advice;
 
 import com.example.iTIME.Exception.MisMatchException;
 import com.example.iTIME.Exception.NotFoundException;
+import jakarta.validation.ValidationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -38,4 +39,13 @@ public class ControllerAdvice {
         errObj.put("ERROR",error.getMessage());
         return errObj;
     }
+
+    @ResponseStatus(HttpStatus.FOUND)
+    @ExceptionHandler(ValidationException.class)
+    public Map<String,String> validationException(ValidationException error){
+        Map<String,String> errObj=new HashMap<>();
+        errObj.put("ERROR",error.getMessage());
+        return errObj;
+    }
 }
+

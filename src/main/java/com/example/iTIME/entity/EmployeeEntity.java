@@ -39,5 +39,5 @@ public class EmployeeEntity {
     List<PermissionTransactionEntity> permissionTransactionEntityList;
 
     @OneToMany(mappedBy = "empId")
-    List<ShiftRoasterEntity> shiftRoasterEntityList;
+    List<ShiftRosterEntity> shiftRosterEntityList;
 }

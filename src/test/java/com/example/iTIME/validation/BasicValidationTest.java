@@ -2,12 +2,20 @@ package com.example.iTIME.validation;
 
 import com.example.iTIME.Exception.CommonException;
 import com.example.iTIME.Exception.MisMatchException;
+import com.example.iTIME.util.AppConstant;
+import com.example.iTIME.util.DateTimeUtil;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.DateTimeException;
+
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class BasicValidationTest {
@@ -67,10 +75,11 @@ class BasicValidationTest {
     }
 
     @Test
-    void checkEmpIdAndDateBasicValidationTest7() throws CommonException {
+    void checkEmpIdAndDateBasicValidationTest7() {
         String empId = "1";
         String date = "20240412";
-        basicValidation.checkEmpIdAndDateBasicValidation(empId,date);
+        assertDoesNotThrow(() -> basicValidation.checkEmpIdAndDateBasicValidation(empId,date));
+
     }
 
 
@@ -107,6 +116,14 @@ class BasicValidationTest {
         String punchType = "";
         assertThrows(NullPointerException.class,()->{
             basicValidation.checkEmpIdAndPunchType(empId,punchType);
+        });
+    }
+
+    @Test
+    void checkEmpIdTest(){
+        String empId = null;
+        assertThrows(NullPointerException.class,()->{
+            basicValidation.checkEmpId(empId);
         });
     }
 }
