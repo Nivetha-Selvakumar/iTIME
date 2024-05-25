@@ -53,48 +53,4 @@ public class Validation {
             }
         }
     }
-
-//    public void checkShiftWeekOffValidation(LocalDate date, int lastWeekOfMonth, boolean isWeekOff) {
-//        Date date1 = Date.from(date.atStartOfDay(ZoneId.systemDefault()).toInstant());
-//        Calendar calendar = Calendar.getInstance();
-//        calendar.setTime(date1);
-//        int weekOfMonth = calendar.get(Calendar.WEEK_OF_MONTH);
-//        if(weekOfMonth == 1){
-//            LocalDate previousMonthLastWeekStartDate = date.minusMonths(1).withDayOfMonth(1)
-//                    .with(WeekFields.ISO.dayOfWeek(), 7);
-//            LocalDate previousMonthLastWeekEndDate = previousMonthLastWeekStartDate.plusDays(6);
-//            checkShiftAssignmentsForWeek(previousMonthLastWeekStartDate, previousMonthLastWeekEndDate,isWeekOff);
-//
-//        }else if (weekOfMonth == lastWeekOfMonth){
-//            LocalDate nextMonthFirstWeekStartDate = date.plusMonths(1).withDayOfMonth(1);
-//            LocalDate nextMonthFirstWeekEndDate = nextMonthFirstWeekStartDate.plusDays(6);
-//
-//            checkShiftAssignmentsForWeek(nextMonthFirstWeekStartDate, nextMonthFirstWeekEndDate, isWeekOff);
-//
-//        }else {
-//            LocalDate weekStartDate = date.with(WeekFields.ISO.dayOfWeek(), 1); // Start of the week
-//            LocalDate weekEndDate = weekStartDate.plusDays(6); // End of the week
-//
-//            checkShiftAssignmentsForWeek(weekStartDate, weekEndDate, isWeekOff);
-//
-//        }
-//    }
-//    private void checkShiftAssignmentsForWeek(LocalDate weekStartDate, LocalDate weekEndDate, boolean isWeekOff) {
-//        int workingDays = 0;
-//        int weekOffs = 0;
-//
-//        // Iterate over each day in the week
-//        for (LocalDate date = weekStartDate; !date.isAfter(weekEndDate); date = date.plusDays(1)) {
-//            if (isWeekOff) {
-//                weekOffs++;
-//            } else {
-//                workingDays++;
-//            }
-//        }
-//
-//        if (workingDays < 5 || workingDays > 6 || weekOffs < 1 || weekOffs > 2) {
-//            throw new ValidationException("Invalid shift assignment for the week starting from: " + weekStartDate +
-//                    ". Must have 5-6 working days and 1-2 week offs.");
-//        }
-//    }
 }

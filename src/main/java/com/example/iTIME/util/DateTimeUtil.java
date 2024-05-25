@@ -33,26 +33,5 @@ public class DateTimeUtil {
         long minutes = duration.minusHours(hours).toMinutes();
         return  String.format("%02d:%02d",hours,minutes);
     }
-//
-//    public static Timestamp convertToTimeStamp(String date) throws CommonException {
-//        try{
-//            return new Timestamp(new SimpleDateFormat(AppConstant.DATE_ONLY_FORMAT).parse(date).getTime());
-//        }catch (final ParseException e){
-//            throw new CommonException(String.format(AppConstant.INVALID_DATE,date));
-//
-//        }
-//    }
-//
-//    public static List<LocalDate> calculateWeekOffs(LocalDate startDate, LocalDate endDate, ShiftRoasterDTO shiftRoasterDTO) {
-//        long numOfDays = ChronoUnit.DAYS.between(startDate, endDate);
-//        return Stream.iterate(startDate, date -> date.plusDays(1))
-//                .limit(numOfDays)
-//                .filter(date -> getIsWeekOff(date, shiftRoasterDTO.getWeekOff1()))
-//                .collect(Collectors.toList());
-//    }
-//
-//    private static boolean getIsWeekOff(LocalDate date, List<String> weekOff1) {
-//        return weekOff1.contains(date.getDayOfWeek().toString().substring(0, 3));
-//    }
 
 }

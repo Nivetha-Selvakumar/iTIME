@@ -29,20 +29,4 @@ public enum EnumDayOfWeek {
         return day;
     }
 
-//    public static EnumDayOfWeek valuesOf(String value){
-//        for (EnumDayOfWeek d :values()){
-//            if(d.value.equals(value)){
-//                return d;
-//            }
-//        }
-//        return null;
-//    }
-//    public static EnumDayOfWeek getByDay(String day){
-//        for (EnumDayOfWeek d :values()){
-//            if(d.day.equals(day)){
-//                return d;
-//            }
-//        }
-//        return null;
-//    }
 }

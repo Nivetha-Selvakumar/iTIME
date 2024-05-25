@@ -22,7 +22,7 @@ public class ShiftController {
     BasicValidation basicValidation;
 
     @GetMapping(path = "/calculateWorkingHours")
-    public ResponseEntity<ResponseWorkingHrsDTO> viewShiftWorking(@RequestHeader String empId, @RequestParam String date)
+    public ResponseEntity<ResponseWorkingHrsDTO> viewShiftWorking (@RequestHeader String empId, @RequestParam String date)
             throws CommonException {
         basicValidation.checkEmpIdAndDateBasicValidation(empId, date);
         ResponseWorkingHrsDTO response = shiftService.calculateWorkingHours(empId, date);
@@ -40,6 +40,8 @@ public class ShiftController {
     @PostMapping(path = "/shiftRoaster/create")
     public String createShiftRoaster(@RequestHeader String empId, @RequestBody ShiftRosterDTO shiftRosterDTO) throws CommonException {
         basicValidation.checkEmpId(empId);
+        basicValidation.checkShiftRosterDTO(shiftRosterDTO);
+
         shiftService.shiftAssign(empId,shiftRosterDTO);
         return AppConstant.SUCCESSFULLY_REGISTERED;
     }

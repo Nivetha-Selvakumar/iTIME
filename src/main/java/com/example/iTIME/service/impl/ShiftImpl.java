@@ -75,11 +75,11 @@ public class ShiftImpl implements ShiftService {
         workHoursResponseDTO.setAssignedWorkHours(DateTimeUtil.convertHoursAndMinutes(workHrsDuration));
         LocalTime workingTime = null;
         LocalTime shiftTime = null;
-        if(!workHoursResponseDTO.getActualWorkHours().matches( "--:--")){
+        if(!workHoursResponseDTO.getActualWorkHours().matches(AppConstant.NULL_FORMAT)){
             workingTime = LocalTime.parse(workHoursResponseDTO.getActualWorkHours(),
                     DateTimeFormatter.ofPattern("HH:mm"));
         }
-        if (!workHoursResponseDTO.getAssignedWorkHours().matches("--:--")){
+        if (!workHoursResponseDTO.getAssignedWorkHours().matches(AppConstant.NULL_FORMAT)){
             shiftTime = LocalTime.parse(workHoursResponseDTO.getAssignedWorkHours(),
                     DateTimeFormatter.ofPattern("HH:mm"));
         }
@@ -169,14 +169,10 @@ public class ShiftImpl implements ShiftService {
                                                        ShiftRosterDTO shiftRosterDTO, ShiftRosterEntity shiftRosterEntity) {
         Optional<ShiftRosterEntity> shiftRoasterEntity1 = shiftRoasterRepo.findByEmpIdAndMonthAndYear(employeeEntity1,month,year);
 
-
-
-
         if(shiftRosterDTO.getAssignShiftType().equals(String.valueOf(ShiftRoasterType.MONTHLY))){
             for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
                 int dayOfMonth = date.getDayOfMonth();
                 boolean isWeekOff = isWeekOff(date, shiftRosterDTO);
-//                validation.checkShiftWeekOffValidation(date,lastWeekOfMonth,isWeekOff);
                 Integer shiftValue = isWeekOff ? 0 : shiftEntity.getId();
                 if (shiftRoasterEntity1.isEmpty()) {
                     setShiftValue(shiftValue, dayOfMonth, shiftRosterEntity);
@@ -301,8 +297,8 @@ public class ShiftImpl implements ShiftService {
         }
 
         String permissionDurationString= DateTimeUtil.convertHoursAndMinutes(permissionDuration);
-        if(permissionDurationString.matches("00:00")){
-            responseWorkingHrsDTO.setPermissionHours("--:--");
+        if(permissionDurationString.matches(AppConstant.ZERO_FORMAT)){
+            responseWorkingHrsDTO.setPermissionHours(AppConstant.NULL_FORMAT);
         }else{
             responseWorkingHrsDTO.setPermissionHours(permissionDurationString);
         }
@@ -359,8 +355,8 @@ public class ShiftImpl implements ShiftService {
         PunchTypeEntity firstPunchIn = punchInList.isEmpty() ? null : punchInList.get(0);
         PunchTypeEntity lastPunchOut = punchOutList.isEmpty() ? null : punchOutList.get(0);
 
-        responseWorkingHrsDTO.setPunchIn(firstPunchIn!=null? DateTimeUtil.convertTimeStampToTime(firstPunchIn.getPunchTime()):"--:--");
-        responseWorkingHrsDTO.setPunchOut(lastPunchOut!=null? DateTimeUtil.convertTimeStampToTime(lastPunchOut.getPunchTime()):"--:--");
+        responseWorkingHrsDTO.setPunchIn(firstPunchIn!=null? DateTimeUtil.convertTimeStampToTime(firstPunchIn.getPunchTime()):AppConstant.NULL_FORMAT);
+        responseWorkingHrsDTO.setPunchOut(lastPunchOut!=null? DateTimeUtil.convertTimeStampToTime(lastPunchOut.getPunchTime()):AppConstant.NULL_FORMAT);
 
         //Check permission
         Timestamp startOfDay = Timestamp.valueOf(date.atStartOfDay());
@@ -377,8 +373,8 @@ public class ShiftImpl implements ShiftService {
         }
 
         String permissionDurationString= DateTimeUtil.convertHoursAndMinutes(permissionDuration);
-        if(permissionDurationString.matches("00:00")){
-            responseWorkingHrsDTO.setPermissionHours("--:--");
+        if(permissionDurationString.matches(AppConstant.ZERO_FORMAT)){
+            responseWorkingHrsDTO.setPermissionHours(AppConstant.NULL_FORMAT);
         }else{
             responseWorkingHrsDTO.setPermissionHours(permissionDurationString);
         }
@@ -397,7 +393,7 @@ public class ShiftImpl implements ShiftService {
                 }
             responseWorkingHrsDTO.setWorkingHours(DateTimeUtil.convertHoursAndMinutes(workDuration));
         }else{
-            responseWorkingHrsDTO.setWorkingHours("--:--");
+            responseWorkingHrsDTO.setWorkingHours(AppConstant.NULL_FORMAT);
         }
 
     }
@@ -457,15 +453,18 @@ public class ShiftImpl implements ShiftService {
         PunchTypeEntity lastPunchOut = punchOutList.isEmpty() ? null : punchOutList.get(0);
 
         //Converting to timestamp format
-        responseWorkingHrsDTO.setPunchIn(firstPunchIn!=null? DateTimeUtil.convertTimeStampToTime(firstPunchIn.getPunchTime()):"--:--");
-        responseWorkingHrsDTO.setPunchOut(lastPunchOut!=null?DateTimeUtil.convertTimeStampToTime(lastPunchOut.getPunchTime()):"--:--");
+        responseWorkingHrsDTO.setPunchIn(firstPunchIn!=null? DateTimeUtil.convertTimeStampToTime(firstPunchIn.getPunchTime()):AppConstant.NULL_FORMAT);
+        responseWorkingHrsDTO.setPunchOut(lastPunchOut!=null?DateTimeUtil.convertTimeStampToTime(lastPunchOut.getPunchTime()):AppConstant.NULL_FORMAT);
 
 
         //Check permission
         Timestamp startOfDay = Timestamp.valueOf(date.atStartOfDay());
         Timestamp endOfDay = Timestamp.valueOf(date.atStartOfDay().plusDays(1).minusNanos(1));
 
-        PermissionTransactionEntity permissionTransactionEntity = permissionTransactionRepo.findByEmpIdAndPermissionDateBetweenAndApprovalStatus(employeeEntity,startOfDay,endOfDay,PermissionStatus.APPROVED);
+        PermissionTransactionEntity permissionTransactionEntity =
+                permissionTransactionRepo.findByEmpIdAndPermissionDateBetweenAndApprovalStatus
+                        (employeeEntity,startOfDay,endOfDay,PermissionStatus.APPROVED);
+
         LocalTime permissionStartTime=null;
         LocalTime permissionEndTime=null;
         Duration permissionDuration = Duration.ZERO;
@@ -475,8 +474,8 @@ public class ShiftImpl implements ShiftService {
             permissionDuration = Duration.between(permissionStartTime,permissionEndTime);
         }
         String permissionDurationString= DateTimeUtil.convertHoursAndMinutes(permissionDuration);
-        if(permissionDurationString.matches("00:00")){
-            responseWorkingHrsDTO.setPermissionHours("--:--");
+        if(permissionDurationString.matches(AppConstant.ZERO_FORMAT)){
+            responseWorkingHrsDTO.setPermissionHours(AppConstant.NULL_FORMAT);
         }else{
             responseWorkingHrsDTO.setPermissionHours(permissionDurationString);
         }
@@ -498,7 +497,7 @@ public class ShiftImpl implements ShiftService {
 
             responseWorkingHrsDTO.setWorkingHours(DateTimeUtil.convertHoursAndMinutes( workDuration));
          }else{
-            responseWorkingHrsDTO.setWorkingHours("--:--");
+            responseWorkingHrsDTO.setWorkingHours(AppConstant.NULL_FORMAT);
         }
     }
 }
