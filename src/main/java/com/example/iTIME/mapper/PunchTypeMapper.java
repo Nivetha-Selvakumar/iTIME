@@ -5,9 +5,6 @@ import com.example.iTIME.entity.EmployeeEntity;
 import com.example.iTIME.entity.PunchTypeEntity;
 import org.springframework.stereotype.Component;
 
-import java.sql.Timestamp;
-import java.time.Instant;
-
 @Component
 public class PunchTypeMapper {
 

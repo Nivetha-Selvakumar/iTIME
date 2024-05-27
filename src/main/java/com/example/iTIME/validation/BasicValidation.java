@@ -1,12 +1,15 @@
 package com.example.iTIME.validation;
 
+import com.example.iTIME.DTO.ShiftRosterDTO;
+import com.example.iTIME.Enum.EnumDayOfWeek;
+import com.example.iTIME.Enum.ShiftRoasterType;
 import com.example.iTIME.Exception.CommonException;
 import com.example.iTIME.Exception.MisMatchException;
 import com.example.iTIME.util.AppConstant;
 import org.springframework.context.annotation.Configuration;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 @Configuration
 public class BasicValidation {
@@ -31,34 +34,16 @@ public class BasicValidation {
         if (punchType == null || punchType.isEmpty()){
             throw new NullPointerException(AppConstant.NO_PUNCH);
         }else{
-            if(!punchType.matches("IN") || punchType.matches("OUT")){
+            if(!punchType.matches(AppConstant.IN) || punchType.matches(AppConstant.OUT)){
                 throw new MisMatchException(AppConstant.PUNCHTYPE_MISMATCH);
             }
         }
     }
 
     private void dateBasicValidation(String date) throws CommonException {
-        if (date == null || date.isEmpty()){
-            throw new NullPointerException(AppConstant.NO_DATE);
-        }else{
-            if (!date.matches("\\d{8}")){
-                throw new MisMatchException(AppConstant.DATE_MISMATCH);
-            }
 
-            int year = Integer.parseInt(date.substring(0, 4));
-            int month = Integer.parseInt(date.substring(4, 6));
-            int day = Integer.parseInt(date.substring(6, 8));
-
-            if (year < 1 || month < 1 || month > 12 || day < 1 || day > 31) {
-                throw new MisMatchException(AppConstant.INVALID_DATE);
-            }
-            // Check if the parsed values form a valid date
-            LocalDate parsedDate = LocalDate.of(year, month, day);
-
-            String parsedDateString = parsedDate.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
-            if (!parsedDateString.equals(date)) {
-                throw new MisMatchException(AppConstant.DATE_MISMATCH);
-            }
+        if(!date.matches(AppConstant.DATE_REGEX)){
+            throw new MisMatchException(AppConstant.INVALID_DATE);
         }
     }
 
@@ -73,4 +58,77 @@ public class BasicValidation {
     }
 
 
+    public void checkShiftRosterDTO(ShiftRosterDTO shiftRosterDTO) throws CommonException {
+
+        validateAssignShiftType(shiftRosterDTO.getAssignShiftType());
+
+        if (!shiftRosterDTO.getStartDate().matches(AppConstant.DATE_VALIDATION_REGEX)) {
+            throw new MisMatchException(AppConstant.INVALID_START_DATE);
+        }
+
+        if (!shiftRosterDTO.getEndDate().matches(AppConstant.DATE_VALIDATION_REGEX) ) {
+            throw new MisMatchException(AppConstant.INVALID_END_DATE);
+        }
+
+        LocalDate startDate = LocalDate.parse(shiftRosterDTO.getStartDate());
+        LocalDate endDate = LocalDate.parse(shiftRosterDTO.getEndDate());
+
+        if (endDate.isBefore(startDate)){
+            throw new MisMatchException(AppConstant.END_DATE_AFTER_START_DATE);
+        }
+
+        if (!shiftRosterDTO.getMonth().matches(AppConstant.MONTH_VALIDATION_REGEX)) {
+            throw new MisMatchException(AppConstant.INVALID_MONTH);
+        }
+
+        String startDateMonth = shiftRosterDTO.getStartDate().substring(5, 7);
+
+        if (!shiftRosterDTO.getMonth().equals(startDateMonth)) {
+            throw new MisMatchException(AppConstant.MONTH_DOES_NOT_MATCHES_DATE);
+        }
+
+
+        if (!shiftRosterDTO.getYear().matches(AppConstant.YEAR_VALIDATION_REGEX)) {
+            throw new MisMatchException(AppConstant.INVALID_YEAR);
+        }
+
+        if (!shiftRosterDTO.getYear().equals(shiftRosterDTO.getStartDate().substring(0, 4))) {
+            throw new MisMatchException(AppConstant.YEAR_DOES_NOT_MATCHES_DATE);
+        }
+
+        validateWeekOff(shiftRosterDTO.getWeekOff1());
+        validateWeekOff(shiftRosterDTO.getWeekOff2());
+        validateWeekOff(shiftRosterDTO.getWeekOff3());
+        validateWeekOff(shiftRosterDTO.getWeekOff4());
+        validateWeekOff(shiftRosterDTO.getWeekOff5());
+        validateWeekOff(shiftRosterDTO.getWeekOff6());
+    }
+
+    private void validateWeekOff(List<String> weekOff) throws CommonException {
+        for (String days : weekOff){
+            boolean found = false;
+            for(EnumDayOfWeek day : EnumDayOfWeek.values()){
+                if(day.name().equals(days)){
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                throw new MisMatchException(AppConstant.WEEK_OFF_DAY_INVALID);
+            }
+        }
+    }
+
+    private void validateAssignShiftType(String assignShiftType) throws CommonException {
+        boolean found = false;
+        for (ShiftRoasterType type : ShiftRoasterType.values()) {
+            if (type.name().equals(assignShiftType)) {
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            throw new MisMatchException(AppConstant.ASSIGN_SHIFT_NOT_FOUND);
+        }
+    }
 }

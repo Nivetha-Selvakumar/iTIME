@@ -1,7 +1,6 @@
 package com.example.iTIME.DTO;
 
 
-import com.example.iTIME.Enum.ShiftRoasterType;
 import lombok.*;
 
 import java.util.List;
@@ -10,14 +9,14 @@ import java.util.List;
 @Getter
 @Setter
 @Data
-public class ShiftRoasterDTO {
+public class ShiftRosterDTO {
 
 
     private  List <Integer> employeeList;
 
     private  String shiftType;//general shift
 
-    private ShiftRoasterType assignShiftType;//monthly yearly
+    private String assignShiftType;//monthly yearly
 
     private String startDate;
 
