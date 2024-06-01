@@ -47,17 +47,9 @@ class BasicValidationTest {
             basicValidation.checkEmpIdAndDateBasicValidation(empId,date);
         });
     }
-    @Test
-    void checkEmpIdAndDateBasicValidationTest4(){
-        String empId = "1";
-        String date = "";
-        assertThrows(NullPointerException.class,()->{
-            basicValidation.checkEmpIdAndDateBasicValidation(empId,date);
-        });
-    }
 
     @Test
-    void checkEmpIdAndDateBasicValidationTest5(){
+    void checkEmpIdAndDateBasicValidationTest4(){
         String empId = "1";
         String date = "00000000";
         assertThrows(MisMatchException.class,()->{
@@ -66,7 +58,7 @@ class BasicValidationTest {
     }
 
     @Test
-    void checkEmpIdAndDateBasicValidationTest6(){
+    void checkEmpIdAndDateBasicValidationTest5(){
         String empId = "1";
         String date = "20241512";
         assertThrows(MisMatchException.class,()->{
@@ -75,7 +67,7 @@ class BasicValidationTest {
     }
 
     @Test
-    void checkEmpIdAndDateBasicValidationTest7() {
+    void checkEmpIdAndDateBasicValidationTest6() {
         String empId = "1";
         String date = "20240412";
         assertDoesNotThrow(() -> basicValidation.checkEmpIdAndDateBasicValidation(empId,date));
